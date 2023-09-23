@@ -211,10 +211,14 @@ async function main(whenFinished: () => void) {
     // Determine the winner
     if (determineWinner) {
       console.log(`Cards in dealer's hand: ${handToString(dealer.hand)} and total is ${dealer.total}`);
-      if (dealer.total > 21 || playerTotal > dealer.total) {
+      if (dealer.total > 21) {
+        console.log("Dealer bust! You win!");
+      } else if (playerTotal > dealer.total) {
         console.log("You win!");
       } else if (dealer.total > playerTotal) {
         console.log("Dealer wins!");
+      } else if (dealer.total > 21 && playerTotal > 21) {
+        console.log("Busty boys! Dealer wins!");
       } else {
         console.log("It's a tie!");
       }
