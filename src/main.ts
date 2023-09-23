@@ -151,22 +151,23 @@ async function main(whenFinished: () => void) {
           playerAceCount++; // Increment the count of aces
         }
         playerTotal += getValue(card.rank, playerTotal);
+
+        // Check for aces and adjust the total value if needed
+        if (playerTotal > 21 && playerAceCount > 0) {
+          playerTotal -= 10; // Deduct 10 for an ace acting as 11
+          playerAceCount--;
+        }
         // total = hand.reduce((total, card) => total + (card?.rank) || 0), 0));
         // Push the card into the playerHand array
         playerHand.push(card);
-        console.log(`Hit with ${card?.Suit} ${card?.rank}.`);
+        console.log(`Hit with ${card?.rank}${card?.Suit}.`);
         console.log(`Cards in your hand: ${handToString(playerHand)} and total is ${playerTotal}`)
       }
-     
-      // Check for aces and adjust the total value if needed
-      if (playerTotal > 21 && playerAceCount > 0) {
-        playerTotal -= 10; // Deduct 10 for an ace acting as 11
-        playerAceCount--;
-      }
 
-      // Check if the player's total is greater than 21 or they choose to stand
-      if (playerTotal > 21 || !canHit) {
-        break;
+      // Check if the player's total is less than or equal 21 or they choose to stand
+      if ( playerTotal <= 21 && !canHit) {
+        dealerTurn = true;
+        // break;
       }
 
       break;
@@ -197,18 +198,20 @@ async function main(whenFinished: () => void) {
           }
             dealer.total += getValue(card.rank, dealer.total);
             dealer.hand.push(card);
+            // Check for aces and adjust the total value if needed
+            if (dealer.total > 21 && dealerAceCount > 0) {
+              dealer.total -= 10; // Deduct 10 for an ace acting as 11
+              dealerAceCount--;
+            }
         }
       }
 
-      // Check for aces and adjust the total value if needed
-      if (dealer.total > 21 && dealerAceCount > 0) {
-        dealer.total -= 10; // Deduct 10 for an ace acting as 11
-        dealerAceCount--;
-      }
 
       // Check if the player's total is greater than 21
       if (dealer.total > 21) {
-        break;
+        console.log("Dealer bust! You win!");
+        playAgain = true;
+        // break;
       }
   
       dealerTurn = false;
@@ -246,8 +249,8 @@ async function main(whenFinished: () => void) {
      if (response === "h") {
        canHit = true;
      } else if (response === "s") {
-       canHit = false;
        dealerTurn = true;
+       canHit = false;
      }
    } else {
       const response = await readConsole.questionAsync("Play again? (y/n) \n");
