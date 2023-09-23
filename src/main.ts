@@ -71,6 +71,7 @@ function countAces(hand: Card[]) {
   return aceTotal;
 }
 
+
 async function main(whenFinished: () => void) {
   const deck = new Deck();
   shuffleDeck(deck.cards);
@@ -93,6 +94,30 @@ async function main(whenFinished: () => void) {
   let dealerTurn = false;
   let determineWinner = false;
   let blackJack = false;
+  let playAgain = false;
+
+  function restartGame () {
+    // Reset game state for a new round
+    playerHand.length = 0;
+    dealer.hand.length = 0;
+    dealer.total = 0;
+    playerAceCount = 0;
+    dealerAceCount = 0;
+    playing = true;
+    canHit = false;
+    dealerTurn = false;
+    determineWinner = false;
+    playAgain = false;
+    shuffleDeck(deck.cards);
+    
+    playerHand.push(deck.cards.pop()!);
+    dealer.hand.push(deck.cards.pop()!);
+    playerHand.push(deck.cards.pop()!);
+
+    playerTotal = calculateTotal(playerHand);
+    console.log("Player's hand: ", handToString(playerHand));
+    console.log("Dealer's hand: ", handToString([dealer.hand[0]]));
+}
 
   console.log("Player's hand: ", handToString(playerHand));
   console.log("Dealer's hand: ", handToString([dealer.hand[0]]));
@@ -141,7 +166,8 @@ async function main(whenFinished: () => void) {
     // Check if the player's total is greater than 21 (bust)
     if (playerTotal > 21) {
       console.log("Bust! You lose");
-      break;
+      playAgain = true;
+      // break;
     }
 
 
@@ -193,22 +219,33 @@ async function main(whenFinished: () => void) {
         console.log("It's a tie!");
       }
       
-      break;
+      playAgain = true;
+      // break;
     }
     
-    // Prompt the player for their choice synchronously
-    const response = await readConsole.questionAsync("Stand, Hit (s/h) \n");
+   if (!playAgain) {
+     const response = await readConsole.questionAsync("Stand, Hit (s/h) \n");
+ 
+     if (response !== "h" && response !== "s") {
+       playing = false;
+     }
 
-    if (response !== "h" && response !== "s") {
-      playing = false;
-    }
-    
-    if (response === "h") {
-      canHit = true;
-    } else if (response === "s") {
-      canHit = false;
-      dealerTurn = true;
-    }
+     if (response === "h") {
+       canHit = true;
+     } else if (response === "s") {
+       canHit = false;
+       dealerTurn = true;
+     }
+   } else {
+      const response = await readConsole.questionAsync("Play again? (y/n) \n");
+
+      if (response !== "y") {
+        playing = false;
+      } else {
+        playAgain = true;
+        restartGame();
+      }
+   }
     
   }
   whenFinished();
