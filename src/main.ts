@@ -85,7 +85,6 @@ async function main(whenFinished: () => void) {
   
   const playerHand = new Array<Card | undefined>();
   const dealer = new Dealer();
-  const usedCards: Card[] = [];
 
   // Deal the initial cards
   playerHand.push(deck.cards.pop()!); // Player's first card
@@ -116,10 +115,6 @@ async function main(whenFinished: () => void) {
     dealerTurn = false;
     determineWinner = false;
     playAgain = false;
-    
-    // Move used cards back to the deck
-    deck.cards.push(...usedCards);
-    usedCards.length = 0; // Clear the used cards array
     
     shuffleDeck(deck.cards);
     
@@ -152,7 +147,6 @@ async function main(whenFinished: () => void) {
       const card = deck.cards.pop();
       
       if (card) {
-        usedCards.push(card);
         if (card.rank === "A") {
           playerAceCount++; // Increment the count of aces
         }
@@ -198,7 +192,6 @@ async function main(whenFinished: () => void) {
       while(dealer.total < 17 || (dealer.total < playerTotal && dealer.total <= 21)) {
         const card = deck.cards.pop();
         if (card) {
-          usedCards.push(card);
           if (card.rank === "A") {
             dealerAceCount++; // Increment the count of aces
           }
