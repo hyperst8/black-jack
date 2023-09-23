@@ -25,14 +25,21 @@ class Dealer {
   public total: number = 0;
 }
 
-function shuffleDeck(array: any[]) {
-  for (let i = 0; i < array.length; i++) {
-      let j = Math.floor(Math.random() * array.length); // (0-1) * 52 => (0-51.9999)
-      // let temp = array[i];
-      // array[i] = array[j];
-      // array[j] = temp;
-      [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+function shuffleDeck(deck: any[]) {
+  // Create a new deck with all 52 cards
+  const newDeck = new Deck().cards;
+
+  for (let i = 0; i < newDeck.length; i++) {
+      let j = Math.floor(Math.random() * newDeck.length); // (0-1) * 52 => (0-51.9999)
+      // let temp = newDeck[i];
+      // newDeck[i] = newDeck[j];
+      // newDeck[j] = temp;
+      [newDeck[i], newDeck[j]] = [newDeck[j], newDeck[i]]; // Swap elements
   }
+
+  // Replace the old deck with the shuffled new deck
+  deck.length = 0;
+  deck.push(...newDeck);
 }
 
 function handToString(hand: Card[]) {
@@ -78,6 +85,7 @@ async function main(whenFinished: () => void) {
   
   const playerHand = new Array<Card | undefined>();
   const dealer = new Dealer();
+  const usedCards: Card[] = [];
 
   // Deal the initial cards
   playerHand.push(deck.cards.pop()!); // Player's first card
@@ -108,6 +116,11 @@ async function main(whenFinished: () => void) {
     dealerTurn = false;
     determineWinner = false;
     playAgain = false;
+    
+    // Move used cards back to the deck
+    deck.cards.push(...usedCards);
+    usedCards.length = 0; // Clear the used cards array
+    
     shuffleDeck(deck.cards);
     
     playerHand.push(deck.cards.pop()!);
@@ -115,10 +128,11 @@ async function main(whenFinished: () => void) {
     playerHand.push(deck.cards.pop()!);
 
     playerTotal = calculateTotal(playerHand);
+    console.log("Cards in deck RESET",deck.cards.length)
     console.log("Player's hand: ", handToString(playerHand));
     console.log("Dealer's hand: ", handToString([dealer.hand[0]]));
 }
-
+  console.log("Cards in deck",deck.cards.length)
   console.log("Player's hand: ", handToString(playerHand));
   console.log("Dealer's hand: ", handToString([dealer.hand[0]]));
   
@@ -138,6 +152,7 @@ async function main(whenFinished: () => void) {
       const card = deck.cards.pop();
       
       if (card) {
+        usedCards.push(card);
         if (card.rank === "A") {
           playerAceCount++; // Increment the count of aces
         }
@@ -183,6 +198,7 @@ async function main(whenFinished: () => void) {
       while(dealer.total < 17 || (dealer.total < playerTotal && dealer.total <= 21)) {
         const card = deck.cards.pop();
         if (card) {
+          usedCards.push(card);
           if (card.rank === "A") {
             dealerAceCount++; // Increment the count of aces
           }
