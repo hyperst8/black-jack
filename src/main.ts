@@ -149,11 +149,11 @@ async function main(whenFinished: () => void) {
       if (card) {
         // Check for aces and adjust the total value if needed
         if (card.rank === "A") {
-          playerAceCount++;
-          if (playerTotal + 11 > 21) {
-            playerTotal += 1; // Add 1 if it busts
+          if (playerTotal + 11 <= 21 && playerAceCount === 0) {
+            playerTotal += 11; // Add 11 if it doesn't bust
+            playerAceCount++;
           } else {
-            playerTotal += 11; // Otherwise, add 11
+            playerTotal += 1; // Otherwise, add 1
           }
         } 
         
@@ -202,9 +202,9 @@ async function main(whenFinished: () => void) {
         const card = deck.cards.pop();
         if (card) {
           if (card.rank === "A") {
-            dealerAceCount++;
-            if (dealer.total + 11 <= 21) {
+            if (dealer.total + 11 <= 21 && dealerAceCount === 0) {
               dealer.total += 11; // Add 11 if it doesn't bust
+              dealerAceCount++;
             } else {
               dealer.total += 1; // Otherwise, add 1
             }
