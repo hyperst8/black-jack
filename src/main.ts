@@ -149,14 +149,22 @@ async function main(whenFinished: () => void) {
       if (card) {
         // Check for aces and adjust the total value if needed
         if (card.rank === "A") {
+          playerAceCount++;
           if (playerTotal + 11 > 21) {
             playerTotal += 1; // Add 1 if it busts
           } else {
             playerTotal += 11; // Otherwise, add 11
           }
-        } else {
-          playerTotal += getValue(card.rank, playerTotal);
+        } 
+        
+        // Check number of aces in hand and reduce for best score possible
+        if (playerTotal > 21 && playerAceCount > 0) {
+          playerTotal -= 10;
+          playerAceCount -= 1; 
         }
+
+        playerTotal += getValue(card.rank, playerTotal);
+        
         // total = hand.reduce((total, card) => total + (card?.rank) || 0), 0));
         // Push the card into the playerHand array
         playerHand.push(card);
@@ -194,14 +202,22 @@ async function main(whenFinished: () => void) {
         const card = deck.cards.pop();
         if (card) {
           if (card.rank === "A") {
+            dealerAceCount++;
             if (dealer.total + 11 <= 21) {
               dealer.total += 11; // Add 11 if it doesn't bust
             } else {
               dealer.total += 1; // Otherwise, add 1
             }
-          } else {
-            dealer.total += getValue(card.rank, dealer.total);
+          } 
+
+          // Check number of aces in hand and reduce for best score possible
+          if (dealer.total > 21 && dealerAceCount > 0) {
+            dealer.total -= 10;
+            dealerAceCount -= 1; 
           }
+            
+          dealer.total += getValue(card.rank, dealer.total);
+          
           dealer.hand.push(card);
         }
       }
@@ -209,7 +225,7 @@ async function main(whenFinished: () => void) {
 
       // Check if the player's total is greater than 21
       if (dealer.total > 21) {
-        console.log("Dealer bust! You win!");
+        console.log("Haha! Dealer bust! Haha!");
         playAgain = true;
         // break;
       }
