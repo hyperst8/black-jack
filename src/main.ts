@@ -194,15 +194,15 @@ async function main(whenFinished: () => void) {
         const card = deck.cards.pop();
         if (card) {
           if (card.rank === "A") {
-            dealerAceCount++; // Increment the count of aces
-          }
-            dealer.total += getValue(card.rank, dealer.total);
-            dealer.hand.push(card);
-            // Check for aces and adjust the total value if needed
-            if (dealer.total > 21 && dealerAceCount > 0) {
-              dealer.total -= 10; // Deduct 10 for an ace acting as 11
-              dealerAceCount--;
+            if (dealer.total + 11 <= 21) {
+              dealer.total += 11; // Add 11 if it doesn't bust
+            } else {
+              dealer.total += 1; // Otherwise, add 1
             }
+          } else {
+            dealer.total += getValue(card.rank, dealer.total);
+          }
+          dealer.hand.push(card);
         }
       }
 
