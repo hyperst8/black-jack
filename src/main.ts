@@ -147,15 +147,15 @@ async function main(whenFinished: () => void) {
       const card = deck.cards.pop();
       
       if (card) {
-        if (card.rank === "A") {
-          playerAceCount++; // Increment the count of aces
-        }
-        playerTotal += getValue(card.rank, playerTotal);
-
         // Check for aces and adjust the total value if needed
-        if (playerTotal > 21 && playerAceCount > 0) {
-          playerTotal -= 10; // Deduct 10 for an ace acting as 11
-          playerAceCount--;
+        if (card.rank === "A") {
+          if (playerTotal + 11 <= 21) {
+            playerTotal += 11; // Add 11 if it doesn't bust
+          } else {
+            playerTotal += 1; // Otherwise, add 1
+          }
+        } else {
+          playerTotal += getValue(card.rank, playerTotal);
         }
         // total = hand.reduce((total, card) => total + (card?.rank) || 0), 0));
         // Push the card into the playerHand array
