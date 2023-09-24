@@ -149,10 +149,10 @@ async function main(whenFinished: () => void) {
       if (card) {
         // Check for aces and adjust the total value if needed
         if (card.rank === "A") {
-          if (playerTotal + 11 <= 21) {
-            playerTotal += 11; // Add 11 if it doesn't bust
+          if (playerTotal + 11 > 21) {
+            playerTotal += 1; // Add 1 if it busts
           } else {
-            playerTotal += 1; // Otherwise, add 1
+            playerTotal += 11; // Otherwise, add 11
           }
         } else {
           playerTotal += getValue(card.rank, playerTotal);
