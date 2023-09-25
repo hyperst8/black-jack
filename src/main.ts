@@ -93,6 +93,11 @@ async function main(whenFinished: () => void) {
   const playerHand = new Array<Card | undefined>();
   const dealer = new Dealer();
 
+  // Specific cards
+  // playerHand.push(deck.cards.find(card => card.rank === "A" && card.Suit === "♠"));
+  // dealer.hand.push(deck.cards.find(card => card.rank === "A" && card.Suit === "♥"));
+  // playerHand.push(deck.cards.find(card => card.rank === "Q" && card.Suit === "♦"));
+
   // Deal the initial cards
   playerHand.push(deck.cards.pop()!); // Player's first card
   dealer.hand.push(deck.cards.pop()!); // Dealer's first card
@@ -139,22 +144,21 @@ async function main(whenFinished: () => void) {
 }
   console.log("Cards in deck",deck.cards.length)
   console.log("Player's hand: ", handToString(playerHand));
-  console.log("Dealer's hand: ", handToString([dealer.hand[0]]));
+  console.log("Dealer's hand: ", handToString(dealer.hand));
   
   
   while (playing) {
-
-    console.log(`Your total is ${playerTotal}`);
-
     // Check if player has Black Jack
-    if (handToString(playerHand).includes("A") && playerTotal === 21) {
+    if (handToString(playerHand).includes("A") && playerTotal === 21 && playerHand.length === 2) {
       blackJackPlayer = true;
       canHit = false;
       dealerTurn = true;
+    } else {
+      console.log(`Your total is ${playerTotal}`);
     }
     
     // Player's turn
-    while (canHit) {
+    while (canHit && !blackJackPlayer) {
 
       // Check if the deck is empty
       if (deck.cards.length === 0) {
@@ -196,11 +200,9 @@ async function main(whenFinished: () => void) {
       playAgain = true;
       // break;
     }
-
-
+    
     //Dealer's turn
     while (dealerTurn) {
-
       // Include the first card in the dealer's total
       if (dealer.hand.length === 1) {
         dealer.total += getValue(dealer.hand[0].rank, dealer.total);
@@ -210,12 +212,7 @@ async function main(whenFinished: () => void) {
       while(dealer.total < 17 || (dealer.total < playerTotal && dealer.total <= 21)) {
         const card = deck.cards.pop();
         if (card) {
-          // Check if Dealer has Black Jack
-          if (handToString(dealer.hand).includes("A") && dealer.total === 21) {
-            blackJackDealer = true;
-            dealerTurn = false;
-            determineWinner = true;
-          }
+          
           // Check number of aces in hand and reduce for best score possible
           if ((card.rank === "A" && dealer.total > 21 && dealerAceCount > 0) || (card.rank !== "A" && dealer.total > 21 && dealerAceCount > 0)) {
             dealer.total += reduceAce(dealer.total, dealerAceCount);
@@ -225,6 +222,15 @@ async function main(whenFinished: () => void) {
           }
           
           dealer.hand.push(card);
+
+          // Check if dealer has Blackjack
+          if (handToString(dealer.hand).includes("A") && dealer.total === 21 && dealer.hand.length === 2) {
+            blackJackDealer = true;
+            dealerTurn = false;
+            determineWinner = true;
+            console.log("Dealer has BLACK JACK");
+          }
+          
         }
       }
 
@@ -244,8 +250,14 @@ async function main(whenFinished: () => void) {
     
     // Determine the winner
     if (determineWinner) {
+  
       console.log(`Cards in dealer's hand: ${handToString(dealer.hand)} and total is ${dealer.total}`);
-      if (dealer.total > 21) {
+
+      if (blackJackPlayer && !blackJackDealer) {
+        console.log("BLACK JACK! You win!");
+      } else if (!blackJackPlayer && blackJackDealer) {
+        console.log("BLACK JACK! Dealer wins!");
+      } else if (dealer.total > 21) {
         console.log("Dealer bust! You win!");
       } else if (playerTotal > dealer.total) {
         console.log("You win!");
@@ -253,10 +265,6 @@ async function main(whenFinished: () => void) {
         console.log("Dealer wins!");
       } else if (dealer.total > 21 && playerTotal > 21) {
         console.log("Busty boys! Dealer wins!");
-      } else if (blackJackPlayer && !blackJackDealer) {
-        console.log("BLACK JACK! You win!");
-      } else if (!blackJackPlayer && blackJackDealer) {
-        console.log("BLACK JACK! Dealer wins!");
       } else {
         console.log("It's a tie!");
       }
