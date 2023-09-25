@@ -167,7 +167,7 @@ async function main(whenFinished: () => void) {
       if (card) {
         
         // Check number of aces in hand and reduce for best score possible
-        if ((card.rank === "A" && playerTotal > 21) || (card.rank !== "A" && playerTotal > 21)) {
+        if ((card.rank === "A" && playerTotal > 21 && playerAceCount > 0) || (card.rank !== "A" && playerTotal > 21 && playerAceCount > 0)) {
           playerTotal += reduceAce(playerTotal, playerAceCount);
         } else {
           playerTotal += getValue(card.rank, playerTotal);
@@ -200,13 +200,6 @@ async function main(whenFinished: () => void) {
 
     //Dealer's turn
     while (dealerTurn) {
-      // Check if Dealer has Black Jack
-      if (handToString(dealer.hand).includes("A") && dealer.total === 21) {
-        blackJackDealer = true;
-        dealerTurn = false;
-        determineWinner = true;
-      }
-
 
       // Include the first card in the dealer's total
       if (dealer.hand.length === 1) {
@@ -217,10 +210,17 @@ async function main(whenFinished: () => void) {
       while(dealer.total < 17 || (dealer.total < playerTotal && dealer.total <= 21)) {
         const card = deck.cards.pop();
         if (card) {
+          // Check if Dealer has Black Jack
+          if (handToString(dealer.hand).includes("A") && dealer.total === 21) {
+            blackJackDealer = true;
+            dealerTurn = false;
+            determineWinner = true;
+          }
           // Check number of aces in hand and reduce for best score possible
-          if ((card.rank === "A" && dealer.total > 21) || (card.rank !== "A" && dealer.total > 21)) {
+          if ((card.rank === "A" && dealer.total > 21 && dealerAceCount > 0) || (card.rank !== "A" && dealer.total > 21 && dealerAceCount > 0)) {
             dealer.total += reduceAce(dealer.total, dealerAceCount);
-          } else {
+          }
+          else {
             dealer.total += getValue(card.rank, dealer.total);
           }
           
