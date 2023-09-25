@@ -78,6 +78,14 @@ function countAces(hand: Card[]) {
   return aceTotal;
 }
 
+// Check number of aces in hand and reduce for best score possible
+function reduceAce(total: number, totalAce: number) {
+  while (total > 21 && totalAce > 0) {
+    total -= 10;
+    totalAce -= 1;
+  }
+  return total;
+}
 
 async function main(whenFinished: () => void) {
   const deck = new Deck();
@@ -136,6 +144,7 @@ async function main(whenFinished: () => void) {
 
     console.log(`Your total is ${playerTotal}`);
     
+    // Player's turn
     while (canHit) {
 
       // Check if the deck is empty
@@ -147,23 +156,14 @@ async function main(whenFinished: () => void) {
       const card = deck.cards.pop();
       
       if (card) {
-        // Check for aces and adjust the total value if needed
-        if (card.rank === "A") {
-          if (playerTotal + 11 <= 21 && playerAceCount === 0) {
-            playerTotal += 11; // Add 11 if it doesn't bust
-            playerAceCount++;
-          } else {
-            playerTotal += 1; // Otherwise, add 1
-          }
-        } 
         
         // Check number of aces in hand and reduce for best score possible
-        if (playerTotal > 21 && playerAceCount > 0) {
-          playerTotal -= 10;
-          playerAceCount -= 1; 
+        if (playerTotal > 21 || (card.rank === "A" && playerTotal > 21)) {
+          playerTotal += reduceAce(playerTotal, playerAceCount);
+        } else {
+          playerTotal += getValue(card.rank, playerTotal);
         }
 
-        playerTotal += getValue(card.rank, playerTotal);
         
         // total = hand.reduce((total, card) => total + (card?.rank) || 0), 0));
         // Push the card into the playerHand array
@@ -201,22 +201,12 @@ async function main(whenFinished: () => void) {
       while(dealer.total < 17 || (dealer.total < playerTotal && dealer.total <= 21)) {
         const card = deck.cards.pop();
         if (card) {
-          if (card.rank === "A") {
-            if (dealer.total + 11 <= 21 && dealerAceCount === 0) {
-              dealer.total += 11; // Add 11 if it doesn't bust
-              dealerAceCount++;
-            } else {
-              dealer.total += 1; // Otherwise, add 1
-            }
-          } 
-
           // Check number of aces in hand and reduce for best score possible
-          if (dealer.total > 21 && dealerAceCount > 0) {
-            dealer.total -= 10;
-            dealerAceCount -= 1; 
+          if (dealer.total > 21 || (card.rank === "A" && dealer.total > 21)) {
+            dealer.total += reduceAce(dealer.total, dealerAceCount);
+          } else {
+            dealer.total += getValue(card.rank, dealer.total);
           }
-            
-          dealer.total += getValue(card.rank, dealer.total);
           
           dealer.hand.push(card);
         }
