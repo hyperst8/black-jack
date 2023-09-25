@@ -161,7 +161,7 @@ async function main(whenFinished: () => void) {
         if ((card.rank === "A" && playerTotal > 21) || (card.rank !== "A" && playerTotal > 21)) {
           playerTotal += reduceAce(playerTotal, playerAceCount);
         } else {
-          // playerTotal += getValue(card.rank, playerTotal);
+          playerTotal += getValue(card.rank, playerTotal);
         }
 
         
