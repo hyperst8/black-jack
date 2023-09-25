@@ -158,10 +158,10 @@ async function main(whenFinished: () => void) {
       if (card) {
         
         // Check number of aces in hand and reduce for best score possible
-        if (playerTotal > 21 || (card.rank === "A" && playerTotal > 21)) {
+        if ((card.rank === "A" && playerTotal > 21) || (card.rank !== "A" && playerTotal > 21)) {
           playerTotal += reduceAce(playerTotal, playerAceCount);
         } else {
-          playerTotal += getValue(card.rank, playerTotal);
+          // playerTotal += getValue(card.rank, playerTotal);
         }
 
         
@@ -202,7 +202,7 @@ async function main(whenFinished: () => void) {
         const card = deck.cards.pop();
         if (card) {
           // Check number of aces in hand and reduce for best score possible
-          if (dealer.total > 21 || (card.rank === "A" && dealer.total > 21)) {
+          if ((card.rank === "A" && dealer.total > 21) || (card.rank !== "A" && dealer.total > 21)) {
             dealer.total += reduceAce(dealer.total, dealerAceCount);
           } else {
             dealer.total += getValue(card.rank, dealer.total);
