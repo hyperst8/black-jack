@@ -7,6 +7,10 @@ const readConsole = readline.createInterface({
   terminal: true,
 });
 
+class Dealer {
+  public hand: Card[] = [];
+  public total: number = 0;
+}
 
 // Get card.rank and convert to number value 
 function getValue(card: string, currentTotal: number) {
@@ -19,11 +23,6 @@ function getValue(card: string, currentTotal: number) {
       return parseInt(card);
     }
 } 
-
-class Dealer {
-  public hand: Card[] = [];
-  public total: number = 0;
-}
 
 function shuffleDeck(deck: any[]) {
   // Create a new deck with all 52 cards
