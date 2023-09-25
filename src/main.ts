@@ -108,7 +108,8 @@ async function main(whenFinished: () => void) {
   let canHit = false;
   let dealerTurn = false;
   let determineWinner = false;
-  let blackJack = false;
+  let blackJackPlayer = false;
+  let blackJackDealer = false;
   let playAgain = false;
 
   function restartGame () {
@@ -123,6 +124,8 @@ async function main(whenFinished: () => void) {
     dealerTurn = false;
     determineWinner = false;
     playAgain = false;
+    blackJackPlayer = false;
+    blackJackDealer = false;
     
     shuffleDeck(deck.cards);
     
@@ -143,6 +146,13 @@ async function main(whenFinished: () => void) {
   while (playing) {
 
     console.log(`Your total is ${playerTotal}`);
+
+    // Check if player has Black Jack
+    if (handToString(playerHand).includes("A") && playerTotal === 21) {
+      blackJackPlayer = true;
+      canHit = false;
+      dealerTurn = true;
+    }
     
     // Player's turn
     while (canHit) {
@@ -189,8 +199,16 @@ async function main(whenFinished: () => void) {
     }
 
 
+    // Check if Dealer has Black Jack
+    if (handToString(dealer.hand).includes("A") && dealer.total === 21) {
+      blackJackDealer = true;
+      dealerTurn = false;
+      determineWinner = true;
+    }
+    
     //Dealer's turn
     while (dealerTurn) {
+
 
       // Include the first card in the dealer's total
       if (dealer.hand.length === 1) {
@@ -237,6 +255,10 @@ async function main(whenFinished: () => void) {
         console.log("Dealer wins!");
       } else if (dealer.total > 21 && playerTotal > 21) {
         console.log("Busty boys! Dealer wins!");
+      } else if (blackJackPlayer && !blackJackDealer) {
+        console.log("BLACK JACK! You win!");
+      } else if (!blackJackPlayer && blackJackDealer) {
+        console.log("BLACK JACK! Dealer wins!");
       } else {
         console.log("It's a tie!");
       }
