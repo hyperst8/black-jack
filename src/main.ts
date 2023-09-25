@@ -198,15 +198,14 @@ async function main(whenFinished: () => void) {
     }
 
 
-    // Check if Dealer has Black Jack
-    if (handToString(dealer.hand).includes("A") && dealer.total === 21) {
-      blackJackDealer = true;
-      dealerTurn = false;
-      determineWinner = true;
-    }
-    
     //Dealer's turn
     while (dealerTurn) {
+      // Check if Dealer has Black Jack
+      if (handToString(dealer.hand).includes("A") && dealer.total === 21) {
+        blackJackDealer = true;
+        dealerTurn = false;
+        determineWinner = true;
+      }
 
 
       // Include the first card in the dealer's total
