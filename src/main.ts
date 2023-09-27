@@ -96,7 +96,7 @@ async function main(whenFinished: () => void) {
   // Specific cards
   // playerHand.push(deck.cards.find(card => card.rank === "A" && card.Suit === "♠"));
   // dealer.hand.push(deck.cards.find(card => card.rank === "A" && card.Suit === "♥"));
-  // playerHand.push(deck.cards.find(card => card.rank === "Q" && card.Suit === "♦"));
+  // playerHand.push(deck.cards.find(card => card.rank === "3" && card.Suit === "♦"));
 
   // Deal the initial cards
   playerHand.push(deck.cards.pop()!); // Player's first card
@@ -169,18 +169,15 @@ async function main(whenFinished: () => void) {
       const card = deck.cards.pop();
       
       if (card) {
-        
-        // Check number of aces in hand and reduce for best score possible
-        if ((card.rank === "A" && playerTotal > 21 && playerAceCount > 0) || (card.rank !== "A" && playerTotal > 21 && playerAceCount > 0)) {
-          playerTotal += reduceAce(playerTotal, playerAceCount);
-        } else {
-          playerTotal += getValue(card.rank, playerTotal);
-        }
-
-        
         // total = hand.reduce((total, card) => total + (card?.rank) || 0), 0));
         // Push the card into the playerHand array
+        playerTotal += getValue(card.rank, playerTotal);
         playerHand.push(card);
+
+        // Check number of aces in hand and reduce for best score possible
+        if (playerTotal > 21 && playerAceCount > 0 && playerHand.length < 5) {
+          playerTotal = reduceAce(playerTotal, playerAceCount);
+        }
         console.log(`Hit with ${card?.rank}${card?.Suit}.`);
         console.log(`Cards in your hand: ${handToString(playerHand)} and total is ${playerTotal}`)
       }
@@ -213,15 +210,14 @@ async function main(whenFinished: () => void) {
         const card = deck.cards.pop();
         if (card) {
           
-          // Check number of aces in hand and reduce for best score possible
-          if ((card.rank === "A" && dealer.total > 21 && dealerAceCount > 0) || (card.rank !== "A" && dealer.total > 21 && dealerAceCount > 0)) {
-            dealer.total += reduceAce(dealer.total, dealerAceCount);
-          }
-          else {
-            dealer.total += getValue(card.rank, dealer.total);
-          }
           
+          dealer.total += getValue(card.rank, dealer.total);
           dealer.hand.push(card);
+          
+          // Check number of aces in hand and reduce for best score possible
+          if (dealer.total > 21 && dealerAceCount > 0 && dealer.hand.length < 5) {
+            dealer.total = reduceAce(dealer.total, dealerAceCount);
+          }
 
           // Check if dealer has Blackjack
           if (handToString(dealer.hand).includes("A") && dealer.total === 21 && dealer.hand.length === 2) {
