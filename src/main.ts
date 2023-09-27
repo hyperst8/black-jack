@@ -94,9 +94,9 @@ async function main(whenFinished: () => void) {
   const dealer = new Dealer();
 
   // Specific cards
-  // playerHand.push(deck.cards.find(card => card.rank === "A" && card.Suit === "♠"));
+  // playerHand.push(deck.cards.find(card => card.rank === "2" && card.Suit === "♠"));
   // dealer.hand.push(deck.cards.find(card => card.rank === "A" && card.Suit === "♥"));
-  // playerHand.push(deck.cards.find(card => card.rank === "3" && card.Suit === "♦"));
+  // playerHand.push(deck.cards.find(card => card.rank === "A" && card.Suit === "♦"));
 
   // Deal the initial cards
   playerHand.push(deck.cards.pop()!); // Player's first card
@@ -175,7 +175,7 @@ async function main(whenFinished: () => void) {
         playerHand.push(card);
 
         // Check number of aces in hand and reduce for best score possible
-        if (playerTotal > 21 && playerAceCount > 0 && playerHand.length < 5) {
+        if (playerTotal > 21 && playerAceCount > 0 && playerHand.length <= 4) {
           playerTotal = reduceAce(playerTotal, playerAceCount);
         }
         console.log(`Hit with ${card?.rank}${card?.Suit}.`);
@@ -215,7 +215,7 @@ async function main(whenFinished: () => void) {
           dealer.hand.push(card);
           
           // Check number of aces in hand and reduce for best score possible
-          if (dealer.total > 21 && dealerAceCount > 0 && dealer.hand.length < 5) {
+          if (dealer.total > 21 && dealerAceCount > 0 && dealer.hand.length <= 4) {
             dealer.total = reduceAce(dealer.total, dealerAceCount);
           }
 
