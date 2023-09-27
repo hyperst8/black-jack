@@ -86,6 +86,16 @@ function reduceAce(total: number, totalAce: number) {
   return total;
 }
 
+function calculateTotalWithoutAces(hand: Card[]) {
+  let handTotal = 0;
+  for (let i = 0; i < hand.length; i++) {
+    if (hand[i] && hand[i].rank !== "A") {
+      handTotal += getValue(hand[i].rank, handTotal);
+    }
+  }
+  return handTotal;
+}
+
 async function main(whenFinished: () => void) {
   const deck = new Deck();
   shuffleDeck(deck.cards);
@@ -93,15 +103,20 @@ async function main(whenFinished: () => void) {
   const playerHand = new Array<Card | undefined>();
   const dealer = new Dealer();
 
-  // Specific cards
-  // playerHand.push(deck.cards.find(card => card.rank === "2" && card.Suit === "♠"));
-  // dealer.hand.push(deck.cards.find(card => card.rank === "A" && card.Suit === "♥"));
-  // playerHand.push(deck.cards.find(card => card.rank === "A" && card.Suit === "♦"));
+  let dealSpecific = false;
 
-  // Deal the initial cards
-  playerHand.push(deck.cards.pop()!); // Player's first card
-  dealer.hand.push(deck.cards.pop()!); // Dealer's first card
-  playerHand.push(deck.cards.pop()!); // Player's second card
+  // Specific cards
+  if (dealSpecific) {
+    playerHand.push(deck.cards.find(card => card.rank === "2" && card.Suit === "♠"));
+    dealer.hand.push(deck.cards.find(card => card.rank === "A" && card.Suit === "♥"));
+    playerHand.push(deck.cards.find(card => card.rank === "4" && card.Suit === "♦"));
+  } else {
+    // Deal the initial cards
+    playerHand.push(deck.cards.pop()!); // Player's first card
+    dealer.hand.push(deck.cards.pop()!); // Dealer's first card
+    playerHand.push(deck.cards.pop()!); // Player's second card
+  }
+
 
   // Calculate the initial totals
   let playerTotal = calculateTotal(playerHand);
@@ -174,8 +189,10 @@ async function main(whenFinished: () => void) {
         playerTotal += getValue(card.rank, playerTotal);
         playerHand.push(card);
 
+        const nonAceTotal = calculateTotalWithoutAces(playerHand);
+
         // Check number of aces in hand and reduce for best score possible
-        if (playerTotal > 21 && playerAceCount > 0 && playerHand.length <= 4) {
+        if (playerTotal > 21 && playerAceCount > 0 && nonAceTotal < 21) {
           playerTotal = reduceAce(playerTotal, playerAceCount);
         }
         console.log(`Hit with ${card?.rank}${card?.Suit}.`);
@@ -214,8 +231,10 @@ async function main(whenFinished: () => void) {
           dealer.total += getValue(card.rank, dealer.total);
           dealer.hand.push(card);
           
+          const nonAceTotal = calculateTotalWithoutAces(dealer.hand);
+
           // Check number of aces in hand and reduce for best score possible
-          if (dealer.total > 21 && dealerAceCount > 0 && dealer.hand.length <= 4) {
+          if (dealer.total > 21 && dealerAceCount > 0 && nonAceTotal < 21) {
             dealer.total = reduceAce(dealer.total, dealerAceCount);
           }
 
