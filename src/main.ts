@@ -107,9 +107,9 @@ async function main(whenFinished: () => void) {
 
   // Specific cards
   if (dealSpecific) {
-    playerHand.push(deck.cards.find(card => card.rank === "2" && card.Suit === "♠"));
+    playerHand.push(deck.cards.find(card => card.rank === "5" && card.Suit === "♠"));
     dealer.hand.push(deck.cards.find(card => card.rank === "A" && card.Suit === "♥"));
-    playerHand.push(deck.cards.find(card => card.rank === "4" && card.Suit === "♦"));
+    playerHand.push(deck.cards.find(card => card.rank === "A" && card.Suit === "♦"));
   } else {
     // Deal the initial cards
     playerHand.push(deck.cards.pop()!); // Player's first card
