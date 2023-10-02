@@ -12,28 +12,27 @@ class Dealer {
   public total: number = 0;
 }
 
-// Get card.rank and convert to number value 
+// Get card.rank and convert to number value
 function getValue(card: string, currentTotal: number) {
-
-    if (card === "A") {
-      return currentTotal + 11 <= 21 ? 11 : 1;
-    } else if (card === "J" || card === "Q" || card === "K") {
-      return 10;
-    } else {
-      return parseInt(card);
-    }
-} 
+  if (card === "A") {
+    return currentTotal + 11 <= 21 ? 11 : 1;
+  } else if (card === "J" || card === "Q" || card === "K") {
+    return 10;
+  } else {
+    return parseInt(card);
+  }
+}
 
 function shuffleDeck(deck: any[]) {
   // Create a new deck with all 52 cards
   const newDeck = new Deck().cards;
 
   for (let i = 0; i < newDeck.length; i++) {
-      let j = Math.floor(Math.random() * newDeck.length); // (0-1) * 52 => (0-51.9999)
-      // let temp = newDeck[i];
-      // newDeck[i] = newDeck[j];
-      // newDeck[j] = temp;
-      [newDeck[i], newDeck[j]] = [newDeck[j], newDeck[i]]; // Swap elements
+    let j = Math.floor(Math.random() * newDeck.length); // (0-1) * 52 => (0-51.9999)
+    // let temp = newDeck[i];
+    // newDeck[i] = newDeck[j];
+    // newDeck[j] = temp;
+    [newDeck[i], newDeck[j]] = [newDeck[j], newDeck[i]]; // Swap elements
   }
 
   // Replace the old deck with the shuffled new deck
@@ -45,7 +44,7 @@ function handToString(hand: Card[]) {
   let stringHand = "";
   for (let i = 0; i < hand.length; i++) {
     if (hand[i]) {
-      stringHand += `${hand[i].rank}${hand[i].Suit}, `
+      stringHand += `${hand[i].rank}${hand[i].Suit}, `;
     }
   }
   // Remove the trailing comma and space
@@ -57,7 +56,7 @@ function calculateTotal(hand: Card[]) {
   let handTotal = 0;
   for (let i = 0; i < hand.length; i++) {
     if (hand[i]) {
-      handTotal += getValue(hand[i].rank, handTotal)
+      handTotal += getValue(hand[i].rank, handTotal);
     }
   }
   return handTotal;
@@ -99,24 +98,29 @@ function calculateTotalWithoutAces(hand: Card[]) {
 async function main(whenFinished: () => void) {
   const deck = new Deck();
   shuffleDeck(deck.cards);
-  
+
   const playerHand = new Array<Card | undefined>();
   const dealer = new Dealer();
 
-  let dealSpecific = false;
+  let dealSpecific = true;
 
   // Specific cards
   if (dealSpecific) {
-    playerHand.push(deck.cards.find(card => card.rank === "5" && card.Suit === "♠"));
-    dealer.hand.push(deck.cards.find(card => card.rank === "A" && card.Suit === "♥"));
-    playerHand.push(deck.cards.find(card => card.rank === "A" && card.Suit === "♦"));
+    playerHand.push(
+      deck.cards.find((card) => card.rank === "5" && card.Suit === "♠")
+    );
+    dealer.hand.push(
+      deck.cards.find((card) => card.rank === "A" && card.Suit === "♥")
+    );
+    playerHand.push(
+      deck.cards.find((card) => card.rank === "A" && card.Suit === "♦")
+    );
   } else {
     // Deal the initial cards
     playerHand.push(deck.cards.pop()!); // Player's first card
     dealer.hand.push(deck.cards.pop()!); // Dealer's first card
     playerHand.push(deck.cards.pop()!); // Player's second card
   }
-
 
   // Calculate the initial totals
   let playerTotal = calculateTotal(playerHand);
@@ -131,7 +135,7 @@ async function main(whenFinished: () => void) {
   let blackJackDealer = false;
   let playAgain = false;
 
-  function restartGame () {
+  function restartGame() {
     // Reset game state for a new round
     playerHand.length = 0;
     dealer.hand.length = 0;
@@ -145,36 +149,38 @@ async function main(whenFinished: () => void) {
     playAgain = false;
     blackJackPlayer = false;
     blackJackDealer = false;
-    
+
     shuffleDeck(deck.cards);
-    
+
     playerHand.push(deck.cards.pop()!);
     dealer.hand.push(deck.cards.pop()!);
     playerHand.push(deck.cards.pop()!);
 
     playerTotal = calculateTotal(playerHand);
-    console.log("Cards in deck RESET",deck.cards.length)
+    console.log("Cards in deck RESET", deck.cards.length);
     console.log("Player's hand: ", handToString(playerHand));
     console.log("Dealer's hand: ", handToString([dealer.hand[0]]));
-}
-  console.log("Cards in deck",deck.cards.length)
+  }
+  console.log("Cards in deck", deck.cards.length);
   console.log("Player's hand: ", handToString(playerHand));
   console.log("Dealer's hand: ", handToString(dealer.hand));
-  
-  
+
   while (playing) {
     // Check if player has Black Jack
-    if (handToString(playerHand).includes("A") && playerTotal === 21 && playerHand.length === 2) {
+    if (
+      handToString(playerHand).includes("A") &&
+      playerTotal === 21 &&
+      playerHand.length === 2
+    ) {
       blackJackPlayer = true;
       canHit = false;
       dealerTurn = true;
     } else {
       console.log(`Your total is ${playerTotal}`);
     }
-    
+
     // Player's turn
     while (canHit && !blackJackPlayer) {
-
       // Check if the deck is empty
       if (deck.cards.length === 0) {
         console.log("No more cards in the deck.");
@@ -182,7 +188,7 @@ async function main(whenFinished: () => void) {
       }
 
       const card = deck.cards.pop();
-      
+
       if (card) {
         // total = hand.reduce((total, card) => total + (card?.rank) || 0), 0));
         // Push the card into the playerHand array
@@ -196,11 +202,15 @@ async function main(whenFinished: () => void) {
           playerTotal = reduceAce(playerTotal, playerAceCount);
         }
         console.log(`Hit with ${card?.rank}${card?.Suit}.`);
-        console.log(`Cards in your hand: ${handToString(playerHand)} and total is ${playerTotal}`)
+        console.log(
+          `Cards in your hand: ${handToString(
+            playerHand
+          )} and total is ${playerTotal}`
+        );
       }
 
       // Check if the player's total is less than or equal 21 or they choose to stand
-      if ( playerTotal <= 21 && !canHit) {
+      if (playerTotal <= 21 && !canHit) {
         dealerTurn = true;
         // break;
       }
@@ -214,23 +224,24 @@ async function main(whenFinished: () => void) {
       playAgain = true;
       // break;
     }
-    
+
     //Dealer's turn
     while (dealerTurn) {
       // Include the first card in the dealer's total
       if (dealer.hand.length === 1) {
         dealer.total += getValue(dealer.hand[0].rank, dealer.total);
       }
-  
+
       // Continue drawing cards for the dealer until their total is 17 or higher and they don't need to draw
-      while(dealer.total < 17 || (dealer.total < playerTotal && dealer.total <= 21)) {
+      while (
+        dealer.total < 17 ||
+        (dealer.total < playerTotal && dealer.total <= 21)
+      ) {
         const card = deck.cards.pop();
         if (card) {
-          
-          
           dealer.total += getValue(card.rank, dealer.total);
           dealer.hand.push(card);
-          
+
           const nonAceTotal = calculateTotalWithoutAces(dealer.hand);
 
           // Check number of aces in hand and reduce for best score possible
@@ -239,16 +250,18 @@ async function main(whenFinished: () => void) {
           }
 
           // Check if dealer has Blackjack
-          if (handToString(dealer.hand).includes("A") && dealer.total === 21 && dealer.hand.length === 2) {
+          if (
+            handToString(dealer.hand).includes("A") &&
+            dealer.total === 21 &&
+            dealer.hand.length === 2
+          ) {
             blackJackDealer = true;
             dealerTurn = false;
             determineWinner = true;
             console.log("Dealer has BLACK JACK");
           }
-          
         }
       }
-
 
       // Check if the player's total is greater than 21
       if (dealer.total > 21) {
@@ -256,17 +269,19 @@ async function main(whenFinished: () => void) {
         playAgain = true;
         // break;
       }
-  
+
       dealerTurn = false;
       determineWinner = true;
       break;
     }
-    
-    
+
     // Determine the winner
     if (determineWinner) {
-  
-      console.log(`Cards in dealer's hand: ${handToString(dealer.hand)} and total is ${dealer.total}`);
+      console.log(
+        `Cards in dealer's hand: ${handToString(dealer.hand)} and total is ${
+          dealer.total
+        }`
+      );
 
       if (blackJackPlayer && !blackJackDealer) {
         console.log("BLACK JACK! You win!");
@@ -283,25 +298,25 @@ async function main(whenFinished: () => void) {
       } else {
         console.log("It's a tie!");
       }
-      
+
       playAgain = true;
       // break;
     }
-    
-   if (!playAgain) {
-     const response = await readConsole.questionAsync("Stand, Hit (s/h) \n");
- 
-     if (response !== "h" && response !== "s") {
-       playing = false;
-     }
 
-     if (response === "h") {
-       canHit = true;
-     } else if (response === "s") {
-       dealerTurn = true;
-       canHit = false;
-     }
-   } else {
+    if (!playAgain) {
+      const response = await readConsole.questionAsync("Stand, Hit (s/h) \n");
+
+      if (response !== "h" && response !== "s") {
+        playing = false;
+      }
+
+      if (response === "h") {
+        canHit = true;
+      } else if (response === "s") {
+        dealerTurn = true;
+        canHit = false;
+      }
+    } else {
       const response = await readConsole.questionAsync("Play again? (y/n) \n");
 
       if (response !== "y") {
@@ -310,8 +325,7 @@ async function main(whenFinished: () => void) {
         playAgain = true;
         restartGame();
       }
-   }
-    
+    }
   }
   whenFinished();
 }
