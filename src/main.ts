@@ -49,11 +49,24 @@ function handToString(hand: Card[]) {
 
 function calculateTotal(hand: Card[]) {
   let handTotal = 0;
+  let hasAce = false;
   for (let i = 0; i < hand.length; i++) {
     if (hand[i]) {
       handTotal += getValue(hand[i].rank);
+      if (hand[i].rank === "A") {
+        hasAce = true; // Set the Ace flag
+      }
     }
   }
+  // Check if two cards in hand and total is 21 then return 0, which means Black Jack
+  if (hand.length === 2 && handTotal === 21) {
+    return 0;
+  }
+
+  if (hasAce && handTotal > 21) {
+    handTotal -= 10;
+  }
+
   return handTotal;
 }
 
@@ -76,6 +89,7 @@ async function main(whenFinished: () => void) {
 
   let playing = true;
   let canHit = false;
+  let playertTurn = true;
   let dealerTurn = false;
   let determineWinner = false;
   let playAgain = false;
@@ -88,29 +102,31 @@ async function main(whenFinished: () => void) {
     console.log(`Your total is ${playerTotal}`);
 
     // Player's turn
-    while (canHit) {
-      // Check if the deck is empty
-      if (deck.cards.length === 0) {
-        console.log("No more cards in the deck.");
-        break;
+    if (playertTurn) {
+      while (canHit) {
+        // Check if the deck is empty
+        if (deck.cards.length === 0) {
+          console.log("No more cards in the deck.");
+          break;
+        }
+
+        const card = deck.cards.pop();
+
+        if (card) {
+          // total = hand.reduce((total, card) => total + (card?.rank) || 0), 0));
+          // Push the card into the playerHand array
+          playerTotal += getValue(card.rank);
+          playerHand.push(card);
+
+          console.log(`Hit with ${card?.rank}${card?.Suit}.`);
+          console.log(
+            `Cards in your hand: ${handToString(
+              playerHand
+            )} and total is ${playerTotal}`
+          );
+        }
+        canHit = false;
       }
-
-      const card = deck.cards.pop();
-
-      if (card) {
-        // total = hand.reduce((total, card) => total + (card?.rank) || 0), 0));
-        // Push the card into the playerHand array
-        playerTotal += getValue(card.rank);
-        playerHand.push(card);
-
-        console.log(`Hit with ${card?.rank}${card?.Suit}.`);
-        console.log(
-          `Cards in your hand: ${handToString(
-            playerHand
-          )} and total is ${playerTotal}`
-        );
-      }
-      break;
     }
 
     //Dealer's turn
@@ -137,42 +153,19 @@ async function main(whenFinished: () => void) {
       console.log("Who is the winner?");
       playAgain = true;
     }
-    //   console.log(
-    //     `Cards in dealer's hand: ${handToString(dealer.hand)} and total is ${
-    //       dealer.total
-    //     }`
-    //   );
 
-    //   if (blackJackPlayer && !blackJackDealer) {
-    //     console.log("BLACK JACK! You win!");
-    //   } else if (!blackJackPlayer && blackJackDealer) {
-    //     console.log("BLACK JACK! Dealer wins!");
-    //   } else if (dealer.total > 21) {
-    //     console.log("Dealer bust! You win!");
-    //   } else if (playerTotal > dealer.total) {
-    //     console.log("You win!");
-    //   } else if (dealer.total > playerTotal) {
-    //     console.log("Dealer wins!");
-    //   } else if (dealer.total > 21 && playerTotal > 21) {
-    //     console.log("Busty boys! Dealer wins!");
-    //   } else {
-    //     console.log("It's a tie!");
-    //   }
-
-    // playAgain = true;
-    //   // break;
-    // }
-
-    if (!playAgain) {
+    if (playertTurn) {
       const response = await readConsole.questionAsync("Stand, Hit (s/h) \n");
 
       if (response === "h") {
         canHit = true;
       } else if (response === "s") {
-        dealerTurn = true;
         canHit = false;
+        playertTurn = false;
+        dealerTurn = true;
       }
-    } else {
+    }
+    if (playAgain) {
       const response = await readConsole.questionAsync("Play again? (y/n) \n");
 
       if (response !== "y") {
