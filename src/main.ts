@@ -70,6 +70,24 @@ function calculateTotal(hand: Card[]) {
   return handTotal;
 }
 
+function whoWins(playerScore: number, dealerScore: number) {
+  if (playerScore === dealerScore) {
+    console.log("It's a draw");
+  } else if (dealerScore === 0) {
+    console.log("You lose. Dealer has Black Jack");
+  } else if (playerScore === 0) {
+    console.log("You win with Black Jack");
+  } else if (playerScore > 21) {
+    console.log("Bust. You lose");
+  } else if (dealerScore > 21) {
+    console.log("Dealer bust.You win");
+  } else if (playerScore > dealerScore) {
+    console.log("You win");
+  } else {
+    console.log("You lose");
+  }
+}
+
 async function main(whenFinished: () => void) {
   const deck = new Deck();
   shuffleDeck(deck.cards);
@@ -104,12 +122,6 @@ async function main(whenFinished: () => void) {
     // Player's turn
     if (playertTurn) {
       while (canHit) {
-        // Check if the deck is empty
-        if (deck.cards.length === 0) {
-          console.log("No more cards in the deck.");
-          break;
-        }
-
         const card = deck.cards.pop();
 
         if (card) {
@@ -150,7 +162,7 @@ async function main(whenFinished: () => void) {
 
     // Determine the winner
     if (determineWinner) {
-      console.log("Who is the winner?");
+      whoWins(playerTotal, dealerTotal);
       playAgain = true;
     }
 
