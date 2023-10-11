@@ -96,10 +96,10 @@ async function main(whenFinished: () => void) {
   const dealerHand = new Array<Card | undefined>();
 
   // Deal the initial cards
-  playerHand.push(deck.cards.pop()!); // Player's first card
-  dealerHand.push(deck.cards.pop()!); // Dealer's first card
-  playerHand.push(deck.cards.pop()!); // Player's second card
-  dealerHand.push(deck.cards.pop()!); // Dealer's second card
+  for (let i = 0; i < 2; i++) {
+    playerHand.push(deck.cards.pop()!);
+    dealerHand.push(deck.cards.pop()!);
+  }
 
   // Calculate the initial totals
   let playerTotal = calculateTotal(playerHand);
@@ -131,8 +131,9 @@ async function main(whenFinished: () => void) {
         if (card) {
           // total = hand.reduce((total, card) => total + (card?.rank) || 0), 0));
           // Push the card into the playerHand array
-          playerTotal += getValue(card.rank);
+          // playerTotal += getValue(card.rank);
           playerHand.push(card);
+          playerTotal = calculateTotal(playerHand);
 
           console.log(`Hit with ${card?.rank}${card?.Suit}.`);
           console.log(
@@ -162,8 +163,9 @@ async function main(whenFinished: () => void) {
         const card = deck.cards.pop();
 
         if (card) {
-          dealerTotal += getValue(card.rank);
+          // dealerTotal += getValue(card.rank);
           dealerHand.push(card);
+          dealerTotal = calculateTotal(dealerHand);
           console.log(
             `Cards in dealer's hand: ${handToString(
               dealerHand
