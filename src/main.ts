@@ -118,6 +118,10 @@ async function main(whenFinished: () => void) {
 
   while (playing) {
     console.log(`Your total is ${playerTotal}`);
+    if (playerTotal === 0) {
+      playertTurn = false;
+      dealerTurn = true;
+    }
 
     // Player's turn
     if (playertTurn) {
@@ -136,6 +140,12 @@ async function main(whenFinished: () => void) {
               playerHand
             )} and total is ${playerTotal}`
           );
+
+          if (playerTotal > 21) {
+            canHit = false;
+            playertTurn = false;
+            dealerTurn = true;
+          }
         }
         canHit = false;
       }
@@ -143,6 +153,11 @@ async function main(whenFinished: () => void) {
 
     //Dealer's turn
     if (dealerTurn) {
+      if (dealerTotal === 0) {
+        dealerTurn = false;
+        determineWinner = true;
+      }
+
       while (dealerTotal < 17) {
         const card = deck.cards.pop();
 
