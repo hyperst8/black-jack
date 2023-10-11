@@ -96,10 +96,9 @@ async function main(whenFinished: () => void) {
   const dealerHand = new Array<Card | undefined>();
 
   // Deal the initial cards
-  for (let i = 0; i < 2; i++) {
-    playerHand.push(deck.cards.pop()!);
-    dealerHand.push(deck.cards.pop()!);
-  }
+  playerHand.push(deck.cards.pop()!);
+  dealerHand.push(deck.cards.pop()!);
+  playerHand.push(deck.cards.pop()!);
 
   // Calculate the initial totals
   let playerTotal = calculateTotal(playerHand);
@@ -159,7 +158,7 @@ async function main(whenFinished: () => void) {
         determineWinner = true;
       }
 
-      while (dealerTotal < 17) {
+      while (dealerTotal > 0 && dealerTotal < 17) {
         const card = deck.cards.pop();
 
         if (card) {
