@@ -145,7 +145,7 @@ async function main(whenFinished: () => void) {
           if (playerTotal > 21) {
             canHit = false;
             playertTurn = false;
-            dealerTurn = true;
+            determineWinner = true;
           }
         }
         canHit = false;
