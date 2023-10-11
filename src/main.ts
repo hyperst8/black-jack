@@ -35,7 +35,7 @@ function shuffleDeck(deck: any[]) {
   deck.push(...newDeck);
 }
 
-function handToString(hand: Card[]) {
+export function handToString(hand: Card[]) {
   let stringHand = "";
   for (let i = 0; i < hand.length; i++) {
     if (hand[i]) {
@@ -47,7 +47,7 @@ function handToString(hand: Card[]) {
   return stringHand;
 }
 
-function calculateTotal(hand: Card[]) {
+export function calculateTotal(hand: Card[]) {
   let handTotal = 0;
   let hasAce = false;
   for (let i = 0; i < hand.length; i++) {
