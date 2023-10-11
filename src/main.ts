@@ -7,15 +7,10 @@ const readConsole = readline.createInterface({
   terminal: true,
 });
 
-class Dealer {
-  public hand: Card[] = [];
-  public total: number = 0;
-}
-
 // Get card.rank and convert to number value
-function getValue(card: string, currentTotal: number) {
+function getValue(card: string) {
   if (card === "A") {
-    return currentTotal + 11 <= 21 ? 11 : 1;
+    return 11;
   } else if (card === "J" || card === "Q" || card === "K") {
     return 10;
   } else {
@@ -56,40 +51,7 @@ function calculateTotal(hand: Card[]) {
   let handTotal = 0;
   for (let i = 0; i < hand.length; i++) {
     if (hand[i]) {
-      handTotal += getValue(hand[i].rank, handTotal);
-    }
-  }
-  return handTotal;
-}
-
-function countAces(hand: Card[]) {
-  let aceTotal = 0;
-  for (let i = 0; i < hand.length; i++) {
-    if (hand[i] && hand[i].rank === "A") {
-      aceTotal++;
-    }
-    // Do I need to exit the loop when a non-Ace card is encountered?
-    // else {
-    //   break;
-    // }
-  }
-  return aceTotal;
-}
-
-// Check number of aces in hand and reduce for best score possible
-function reduceAce(total: number, totalAce: number) {
-  while (total > 21 && totalAce > 0) {
-    total -= 10;
-    totalAce -= 1;
-  }
-  return total;
-}
-
-function calculateTotalWithoutAces(hand: Card[]) {
-  let handTotal = 0;
-  for (let i = 0; i < hand.length; i++) {
-    if (hand[i] && hand[i].rank !== "A") {
-      handTotal += getValue(hand[i].rank, handTotal);
+      handTotal += getValue(hand[i].rank);
     }
   }
   return handTotal;
@@ -100,87 +62,33 @@ async function main(whenFinished: () => void) {
   shuffleDeck(deck.cards);
 
   const playerHand = new Array<Card | undefined>();
-  const dealer = new Dealer();
+  const dealerHand = new Array<Card | undefined>();
 
-  let dealSpecific = true;
-
-  // Specific cards
-  if (dealSpecific) {
-    playerHand.push(
-      deck.cards.find((card) => card.rank === "5" && card.Suit === "♠")
-    );
-    dealer.hand.push(
-      deck.cards.find((card) => card.rank === "A" && card.Suit === "♥")
-    );
-    playerHand.push(
-      deck.cards.find((card) => card.rank === "A" && card.Suit === "♦")
-    );
-  } else {
-    // Deal the initial cards
-    playerHand.push(deck.cards.pop()!); // Player's first card
-    dealer.hand.push(deck.cards.pop()!); // Dealer's first card
-    playerHand.push(deck.cards.pop()!); // Player's second card
-  }
+  // Deal the initial cards
+  playerHand.push(deck.cards.pop()!); // Player's first card
+  dealerHand.push(deck.cards.pop()!); // Dealer's first card
+  playerHand.push(deck.cards.pop()!); // Player's second card
+  dealerHand.push(deck.cards.pop()!); // Dealer's second card
 
   // Calculate the initial totals
   let playerTotal = calculateTotal(playerHand);
-  let playerAceCount = countAces(playerHand);
-  let dealerAceCount = countAces(dealer.hand);
+  let dealerTotal = calculateTotal(dealerHand);
 
   let playing = true;
   let canHit = false;
   let dealerTurn = false;
   let determineWinner = false;
-  let blackJackPlayer = false;
-  let blackJackDealer = false;
   let playAgain = false;
 
-  function restartGame() {
-    // Reset game state for a new round
-    playerHand.length = 0;
-    dealer.hand.length = 0;
-    dealer.total = 0;
-    playerAceCount = 0;
-    dealerAceCount = 0;
-    playing = true;
-    canHit = false;
-    dealerTurn = false;
-    determineWinner = false;
-    playAgain = false;
-    blackJackPlayer = false;
-    blackJackDealer = false;
-
-    shuffleDeck(deck.cards);
-
-    playerHand.push(deck.cards.pop()!);
-    dealer.hand.push(deck.cards.pop()!);
-    playerHand.push(deck.cards.pop()!);
-
-    playerTotal = calculateTotal(playerHand);
-    console.log("Cards in deck RESET", deck.cards.length);
-    console.log("Player's hand: ", handToString(playerHand));
-    console.log("Dealer's hand: ", handToString([dealer.hand[0]]));
-  }
   console.log("Cards in deck", deck.cards.length);
   console.log("Player's hand: ", handToString(playerHand));
-  console.log("Dealer's hand: ", handToString(dealer.hand));
+  console.log("Dealer's hand: ", handToString(dealerHand));
 
   while (playing) {
-    // Check if player has Black Jack
-    if (
-      handToString(playerHand).includes("A") &&
-      playerTotal === 21 &&
-      playerHand.length === 2
-    ) {
-      blackJackPlayer = true;
-      canHit = false;
-      dealerTurn = true;
-    } else {
-      console.log(`Your total is ${playerTotal}`);
-    }
+    console.log(`Your total is ${playerTotal}`);
 
     // Player's turn
-    while (canHit && !blackJackPlayer) {
+    while (canHit) {
       // Check if the deck is empty
       if (deck.cards.length === 0) {
         console.log("No more cards in the deck.");
@@ -192,15 +100,9 @@ async function main(whenFinished: () => void) {
       if (card) {
         // total = hand.reduce((total, card) => total + (card?.rank) || 0), 0));
         // Push the card into the playerHand array
-        playerTotal += getValue(card.rank, playerTotal);
+        playerTotal += getValue(card.rank);
         playerHand.push(card);
 
-        const nonAceTotal = calculateTotalWithoutAces(playerHand);
-
-        // Check number of aces in hand and reduce for best score possible
-        if (playerTotal > 21 && playerAceCount > 0 && nonAceTotal < 21) {
-          playerTotal = reduceAce(playerTotal, playerAceCount);
-        }
         console.log(`Hit with ${card?.rank}${card?.Suit}.`);
         console.log(
           `Cards in your hand: ${handToString(
@@ -208,107 +110,61 @@ async function main(whenFinished: () => void) {
           )} and total is ${playerTotal}`
         );
       }
-
-      // Check if the player's total is less than or equal 21 or they choose to stand
-      if (playerTotal <= 21 && !canHit) {
-        dealerTurn = true;
-        // break;
-      }
-
       break;
-    }
-
-    // Check if the player's total is greater than 21 (bust)
-    if (playerTotal > 21) {
-      console.log("Bust! You lose");
-      playAgain = true;
-      // break;
     }
 
     //Dealer's turn
-    while (dealerTurn) {
-      // Include the first card in the dealer's total
-      if (dealer.hand.length === 1) {
-        dealer.total += getValue(dealer.hand[0].rank, dealer.total);
-      }
-
-      // Continue drawing cards for the dealer until their total is 17 or higher and they don't need to draw
-      while (
-        dealer.total < 17 ||
-        (dealer.total < playerTotal && dealer.total <= 21)
-      ) {
+    if (dealerTurn) {
+      while (dealerTotal < 17) {
         const card = deck.cards.pop();
+
         if (card) {
-          dealer.total += getValue(card.rank, dealer.total);
-          dealer.hand.push(card);
-
-          const nonAceTotal = calculateTotalWithoutAces(dealer.hand);
-
-          // Check number of aces in hand and reduce for best score possible
-          if (dealer.total > 21 && dealerAceCount > 0 && nonAceTotal < 21) {
-            dealer.total = reduceAce(dealer.total, dealerAceCount);
-          }
-
-          // Check if dealer has Blackjack
-          if (
-            handToString(dealer.hand).includes("A") &&
-            dealer.total === 21 &&
-            dealer.hand.length === 2
-          ) {
-            blackJackDealer = true;
-            dealerTurn = false;
-            determineWinner = true;
-            console.log("Dealer has BLACK JACK");
-          }
+          dealerTotal += getValue(card.rank);
+          dealerHand.push(card);
+          console.log(
+            `Cards in dealer's hand: ${handToString(
+              dealerHand
+            )} and total is ${dealerTotal}`
+          );
         }
+        dealerTurn = false;
+        determineWinner = true;
       }
-
-      // Check if the player's total is greater than 21
-      if (dealer.total > 21) {
-        console.log("Haha! Dealer bust! Haha!");
-        playAgain = true;
-        // break;
-      }
-
-      dealerTurn = false;
-      determineWinner = true;
-      break;
     }
 
     // Determine the winner
     if (determineWinner) {
-      console.log(
-        `Cards in dealer's hand: ${handToString(dealer.hand)} and total is ${
-          dealer.total
-        }`
-      );
-
-      if (blackJackPlayer && !blackJackDealer) {
-        console.log("BLACK JACK! You win!");
-      } else if (!blackJackPlayer && blackJackDealer) {
-        console.log("BLACK JACK! Dealer wins!");
-      } else if (dealer.total > 21) {
-        console.log("Dealer bust! You win!");
-      } else if (playerTotal > dealer.total) {
-        console.log("You win!");
-      } else if (dealer.total > playerTotal) {
-        console.log("Dealer wins!");
-      } else if (dealer.total > 21 && playerTotal > 21) {
-        console.log("Busty boys! Dealer wins!");
-      } else {
-        console.log("It's a tie!");
-      }
-
+      console.log("Who is the winner?");
       playAgain = true;
-      // break;
     }
+    //   console.log(
+    //     `Cards in dealer's hand: ${handToString(dealer.hand)} and total is ${
+    //       dealer.total
+    //     }`
+    //   );
+
+    //   if (blackJackPlayer && !blackJackDealer) {
+    //     console.log("BLACK JACK! You win!");
+    //   } else if (!blackJackPlayer && blackJackDealer) {
+    //     console.log("BLACK JACK! Dealer wins!");
+    //   } else if (dealer.total > 21) {
+    //     console.log("Dealer bust! You win!");
+    //   } else if (playerTotal > dealer.total) {
+    //     console.log("You win!");
+    //   } else if (dealer.total > playerTotal) {
+    //     console.log("Dealer wins!");
+    //   } else if (dealer.total > 21 && playerTotal > 21) {
+    //     console.log("Busty boys! Dealer wins!");
+    //   } else {
+    //     console.log("It's a tie!");
+    //   }
+
+    // playAgain = true;
+    //   // break;
+    // }
 
     if (!playAgain) {
       const response = await readConsole.questionAsync("Stand, Hit (s/h) \n");
-
-      if (response !== "h" && response !== "s") {
-        playing = false;
-      }
 
       if (response === "h") {
         canHit = true;
@@ -322,8 +178,9 @@ async function main(whenFinished: () => void) {
       if (response !== "y") {
         playing = false;
       } else {
-        playAgain = true;
-        restartGame();
+        playing = true;
+        playAgain = false;
+        // Restart game
       }
     }
   }
