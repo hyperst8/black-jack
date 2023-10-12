@@ -49,12 +49,12 @@ export function handToString(hand: Card[]) {
 
 export function calculateTotal(hand: Card[]) {
   let handTotal = 0;
-  let hasAce = false;
+  let hasAce = 0;
   for (let i = 0; i < hand.length; i++) {
     if (hand[i]) {
       handTotal += getValue(hand[i].rank);
       if (hand[i].rank === "A") {
-        hasAce = true; // Set the Ace flag
+        hasAce += 1;
       }
     }
   }
@@ -63,8 +63,9 @@ export function calculateTotal(hand: Card[]) {
     return 0;
   }
 
-  if (hasAce && handTotal > 21) {
-    handTotal -= 10;
+  // Loop through number of aces and reduce times 10 if total is over 21
+  if (hasAce > 0 && handTotal > 21) {
+    handTotal -= hasAce * 10;
   }
 
   return handTotal;

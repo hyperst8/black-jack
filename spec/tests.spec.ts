@@ -45,7 +45,7 @@ describe("calculateTotal function", () => {
     expect(result).toBe(0);
   });
 
-  it("Should reduce total score if contain one Ace and total is over 21", () => {
+  it("Should reduce total score if contains one Ace and total is over 21", () => {
     const cards = [
       new Card("4", Suit.Diamonds),
       new Card("2", Suit.Clubs),
@@ -59,7 +59,7 @@ describe("calculateTotal function", () => {
     expect(result).toBe(20);
   });
 
-  it("Should reduce total score if contain more than one Ace and total is over 21", () => {
+  it("Should reduce total score if contains two Aces and total is over 21", () => {
     const cards = [
       new Card("4", Suit.Diamonds),
       new Card("2", Suit.Clubs),
@@ -71,5 +71,36 @@ describe("calculateTotal function", () => {
     const result = calculateTotal(cards);
 
     expect(result).toBe(14);
+  });
+
+  it("Should reduce total score if contains three Aces total is over 21", () => {
+    const cards = [
+      new Card("4", Suit.Diamonds),
+      new Card("2", Suit.Clubs),
+      new Card("A", Suit.Hearts),
+      new Card("6", Suit.Spades),
+      new Card("A", Suit.Diamonds),
+      new Card("A", Suit.Clubs),
+    ];
+
+    const result = calculateTotal(cards);
+
+    expect(result).toBe(15);
+  });
+
+  it("Should reduce total score if contains four Aces total is over 21", () => {
+    const cards = [
+      new Card("4", Suit.Diamonds),
+      new Card("2", Suit.Clubs),
+      new Card("A", Suit.Hearts),
+      new Card("8", Suit.Spades),
+      new Card("A", Suit.Diamonds),
+      new Card("A", Suit.Clubs),
+      new Card("A", Suit.Spades),
+    ];
+
+    const result = calculateTotal(cards);
+
+    expect(result).toBe(18);
   });
 });
