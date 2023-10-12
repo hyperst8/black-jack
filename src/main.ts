@@ -199,10 +199,11 @@ async function main(whenFinished: () => void) {
 
       if (response !== "y") {
         playing = false;
+        console.clear();
       } else {
-        playing = true;
-        playAgain = false;
         // Restart game
+        console.clear();
+        main(whenFinished);
       }
     }
   }
